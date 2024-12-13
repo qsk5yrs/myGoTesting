@@ -15,11 +15,12 @@ func NewIServer(ctx context.Context) *IServer {
 	return &IServer{ctx: ctx}
 }
 
+// GetScenesConfigNames 获取三维服务中场景名称列表
 func (i *IServer) GetScenesConfigNames(url string) (names []string) {
 	log := logger.New(i.ctx)
 	httpStatusCode, resBody, err := httptool.Get(i.ctx, url)
 	if err != nil {
-		log.Error("IServer GetScenes request error", "err", err, "httpStatusCode", httpStatusCode)
+		log.Error("GetScenesConfigNamesError", "err", err, "httpStatusCode", httpStatusCode)
 		return nil
 	}
 	result := gjson.ParseBytes(resBody).Get("#.name")
@@ -31,11 +32,12 @@ func (i *IServer) GetScenesConfigNames(url string) (names []string) {
 	return
 }
 
+// GetScenesLayerNames 获取单个场景中图层名称列表
 func (i *IServer) GetScenesLayerNames(url string) (layerNames []string) {
 	log := logger.New(i.ctx)
 	httpStatusCode, resBody, err := httptool.Get(i.ctx, url)
 	if err != nil {
-		log.Error("IServer GetScenes request error", "err", err, "httpStatusCode", httpStatusCode)
+		log.Error("GetScenesLayerNamesError", "err", err, "httpStatusCode", httpStatusCode)
 		return nil
 	}
 	result := gjson.ParseBytes(resBody).Get("layers.#.name")
