@@ -48,3 +48,14 @@ func (i *IServer) GetScenesLayerNames(url string) (layerNames []string) {
 
 	return
 }
+
+func (i *IServer) GetUrlContentBytes(url string) ([]byte, error) {
+	log := logger.New(i.ctx)
+	httpStatusCode, resBody, err := httptool.Get(i.ctx, url)
+	if err != nil {
+		log.Error("GetScenesLayerNamesError", "err", err, "httpStatusCode", httpStatusCode)
+		return nil, err
+	}
+
+	return resBody, nil
+}

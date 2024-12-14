@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func SaveStructToJsonFile(data interface{}, filePath string, indent bool) error {
@@ -80,4 +81,45 @@ func JoinURLs(base string, paths []string) (string, error) {
 
 	// 将拼接后的URL转换为字符串
 	return completeURL.String(), nil
+}
+
+func ExtractMiddleUrlPath(urlStr string) (string, error) {
+	// 解析url
+	parsedUrl, err := url.Parse(urlStr)
+	if err != nil {
+		return "", err
+	}
+	// 去除http://localhost:8090
+	path := parsedUrl.Path
+	lastSlashIndex := strings.LastIndex(path, "/")
+	if lastSlashIndex == -1 {
+		return "", fmt.Errorf("no valid path found in Url:%s", urlStr)
+	}
+	// 截取到倒数第二个/之前的部分
+	middlePath := path[:lastSlashIndex]
+
+	return middlePath, nil
+}
+
+func WriteBytesToFile(content []byte, localPath string) error {
+	// 1. 确保文件夹存在
+	dir := filepath.Dir(localPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("error creating directory: %v", err)
+	}
+
+	// 2. 打开文件（如果文件不存在则创建新文件，如果存在则覆盖）
+	file, err := os.OpenFile(localPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return fmt.Errorf("error opening file: %v", err)
+	}
+	defer file.Close()
+
+	// 4. 写入JSON数据到文件
+	_, err = file.Write(content)
+	if err != nil {
+		return fmt.Errorf("error writing to file: %v", err)
+	}
+
+	return nil
 }
